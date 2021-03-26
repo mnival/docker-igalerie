@@ -1,0 +1,83 @@
+name: build and push docker image
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'Dockerfile'
+
+  schedule:
+    - cron:  '15 00 * * *'
+
+jobs:
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        igalerie-version: [3.0.10]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Calculate Docker image tags and caches
+        id: tags_caches
+        env:
+          DOCKER_IMAGES: "${{ github.actor }}/igalerie ghcr.io/${{ github.actor }}/docker-igalerie"
+        run: |
+          TAGS=()
+          CACHES=()
+          COUNT=0
+          for image in $DOCKER_IMAGES; do
+            TAGS+=("${image}:${{ matrix.igalerie-version }}")
+            if [[ ${COUNT} -eq 0 ]]; then
+              CACHES+=("${image}:${{ matrix.igalerie-version }}")
+            fi
+            if [[ "${{ matrix.igalerie-version }}" == "3.0.10" ]]; then
+              TAGS+=("${image}:latest")
+              TAGS+=("${image}:3.0")
+              if [[ ${COUNT} -eq 0 ]]; then
+                CACHES+=("${image}:latest")
+                CACHES+=("${image}:3.0")
+              fi
+            fi
+            ((COUNT+=1))
+          done
+          echo ::set-output name=tags::$(IFS=,; echo "${TAGS[*]}")
+          echo ::set-output name=caches::$(IFS=,; echo "${CACHES[*]}")
+          
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/386,linux/amd64
+          push: true
+          tags: ${{ steps.tags_caches.outputs.tags }}
+          cache-from: ${{ steps.tags_caches.outputs.caches }}
+          cache-to: type=inline
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
