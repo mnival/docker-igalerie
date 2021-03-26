@@ -1,4 +1,4 @@
-FROM php:7.4-apache
+FROM php:7-apache
 LABEL maintainer "Michael Nival <docker@mn-home.fr>"
 
 ENV PHP_MEMORY_LIMIT 128M
