@@ -1,8 +1,6 @@
 FROM php:7-apache
 LABEL maintainer "Michael Nival <docker@mn-home.fr>"
 
-ENV PHP_MEMORY_LIMIT 128M
-ENV PHP_UPLOAD_LIMIT 128M
 RUN set -ex; \
   \
   savedAptMark="$(apt-mark showmanual)"; \
@@ -43,11 +41,17 @@ RUN set -ex; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     rm -rf /var/lib/apt/lists/*
 
+# Value forced in includes/prepend.php
+ENV PHP_MEMORY_LIMIT 512M
+ENV PHP_UPLOAD_LIMIT 128M
+
 RUN { \
   echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
   echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
   echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
   } > /usr/local/etc/php/conf.d/igalerie.ini
+
+VOLUME /var/www/html/customs
 
 ENV IGALERIE_VERSION 3.0.10
 
@@ -63,6 +67,19 @@ RUN set -ex; \
   unzip -qq igalerie.zip; \
   mv igalerie/* .; \
   rm -r igalerie/ igalerie.zip; \
-  chown -R www-data:www-data .; \
+  mkdir /usr/local/src/customs; \
+  for i in albums cache config db errors files images pending template; do \
+    mv ${i} /usr/local/src/customs/; \
+    ln -s customs/${i} .; \
+  done; \
+  chown -R www-data:www-data . /usr/local/src/customs; \
+  # Delete directory install and upgrade.php after install
+  sed -i "s#^\(.*\)\(die;\)#\1File::unlink(GALLERY_ROOT . '/upgrade.php');\n\1foreach (glob(GALLERY_ROOT . '/install/*') as \&\$f) { File::unlink(\$f); };\n\1rmdir(GALLERY_ROOT . '/install/');\n\1\2#g" install/index.php; \
   apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps; \
   rm -rf /var/lib/apt/lists/*
+
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["apache2-foreground"]
