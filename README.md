@@ -25,7 +25,7 @@ Ports
 Volumes
 -------
 
-/var/www/html/customs -- igalerie data
+* /var/www/html/customs -- igalerie data
 
 Maintainer
 ==========
