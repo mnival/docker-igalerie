@@ -10,7 +10,7 @@ on:
       - 'Dockerfile'
 
   schedule:
-    - cron:  '15 00 * * *'
+    - cron:  '15 00 * * 1'
 
 jobs:
   # Push image to GitHub Packages.
