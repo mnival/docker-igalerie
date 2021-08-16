@@ -1,4 +1,4 @@
-FROM php:7-apache
+FROM php:8.0.9-apache-buster
 LABEL maintainer "Michael Nival <docker@mn-home.fr>"
 
 RUN set -ex; \
@@ -53,7 +53,7 @@ RUN { \
 
 VOLUME /var/www/html/customs
 
-ENV IGALERIE_VERSION 3.0.12
+ENV IGALERIE_VERSION 3.0.13
 
 RUN set -ex; \
   fetchDeps=" \
