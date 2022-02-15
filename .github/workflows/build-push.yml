@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        igalerie-version: [3.0.14]
+        igalerie-version: [3.0.15]
 
     steps:
       - name: Checkout
@@ -38,7 +38,7 @@ jobs:
             if [[ ${COUNT} -eq 0 ]]; then
               CACHES+=("${image}:${{ matrix.igalerie-version }}")
             fi
-            if [[ "${{ matrix.igalerie-version }}" == "3.0.14" ]]; then
+            if [[ "${{ matrix.igalerie-version }}" == "3.0.15" ]]; then
               TAGS+=("${image}:latest")
               TAGS+=("${image}:3.0")
               if [[ ${COUNT} -eq 0 ]]; then
