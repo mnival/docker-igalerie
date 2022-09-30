@@ -53,7 +53,7 @@ RUN { \
 
 VOLUME /var/www/html/customs
 
-ENV IGALERIE_VERSION 3.0.15
+ENV IGALERIE_VERSION 3.0.17
 
 RUN set -ex; \
   fetchDeps=" \
