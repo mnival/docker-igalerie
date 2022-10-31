@@ -1,4 +1,4 @@
-FROM php:8.1.11-apache-bullseye
+FROM php:8.1.12-apache-bullseye
 LABEL maintainer "Michael Nival <docker@mn-home.fr>"
 
 RUN set -ex; \
