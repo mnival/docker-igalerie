@@ -1,4 +1,4 @@
-FROM php:8.4.6-apache-bullseye
+FROM php:8.4-apache
 LABEL maintainer "Michael Nival <docker@mn-home.fr>"
 
 RUN set -ex; \
@@ -53,7 +53,7 @@ RUN { \
 
 VOLUME /var/www/html/customs
 
-ENV IGALERIE_VERSION 3.0.26
+ENV IGALERIE_VERSION 3.1.2
 
 RUN set -ex; \
   fetchDeps=" \
