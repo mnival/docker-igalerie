@@ -23,6 +23,18 @@ set -ex
 savedAptMark="$(apt-mark showmanual)"
 
 apt update
+
+# Install runtime dependencies (must be kept in final image)
+apt install -y --no-install-recommends \
+  libpng16-16t64 \
+  libfreetype6 \
+  libjpeg62-turbo \
+  libwebp7 \
+  libzip5 \
+  libpq5 \
+  libonig5
+
+# Install build dependencies (will be removed)
 apt install -y --no-install-recommends \
   libpng-dev \
   libfreetype6-dev \
@@ -43,16 +55,17 @@ docker-php-ext-install -j "$(nproc)" \
   pdo_mysql \
   pdo_pgsql
 
-# Reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+# Remove build dependencies but keep runtime dependencies
 apt-mark auto '.*' > /dev/null
 apt-mark manual $savedAptMark
-ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-  | awk '/=>/ { print $3 }' \
-  | sort -u \
-  | xargs -r dpkg-query -S \
-  | cut -d: -f1 \
-  | sort -u \
-  | xargs -rt apt-mark manual
+apt-mark manual \
+  libpng16-16t64 \
+  libfreetype6 \
+  libjpeg62-turbo \
+  libwebp7 \
+  libzip5 \
+  libpq5 \
+  libonig5
 
 apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 rm -rf /var/lib/apt/lists/*
