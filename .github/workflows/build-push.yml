@@ -38,12 +38,12 @@ jobs:
             if [[ ${COUNT} -eq 0 ]]; then
               CACHES+=("${image}:${{ matrix.igalerie-version }}")
             fi
-            if [[ "${{ matrix.igalerie-version }}" == "3.0.15" ]]; then
+            if [[ "${{ matrix.igalerie-version }}" == "3.1.2" ]]; then
               TAGS+=("${image}:latest")
-              TAGS+=("${image}:3.0")
+              TAGS+=("${image}:3.1")
               if [[ ${COUNT} -eq 0 ]]; then
                 CACHES+=("${image}:latest")
-                CACHES+=("${image}:3.0")
+                CACHES+=("${image}:3.1")
               fi
             fi
             ((COUNT+=1))
