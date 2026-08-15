@@ -1,7 +1,7 @@
 # Stage 1: Download iGalerie
 FROM php:8.6.0alpha2-apache AS downloader
 
-ENV IGALERIE_VERSION=3.1.2
+ENV IGALERIE_VERSION=3.2
 
 RUN <<EOF
 set -ex
