@@ -1,5 +1,5 @@
 # Stage 1: Download iGalerie
-FROM php:8.6.0alpha3-apache AS downloader
+FROM php:8.6.0beta1-apache AS downloader
 
 ENV IGALERIE_VERSION=3.2
 
@@ -15,7 +15,7 @@ rm -rf /var/lib/apt/lists/*
 EOF
 
 # Stage 2: Final image
-FROM php:8.6.0alpha3-apache
+FROM php:8.6.0beta1-apache
 LABEL maintainer="Michael Nival <docker@mn-home.fr>"
 
 RUN <<EOF
